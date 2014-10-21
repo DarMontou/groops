@@ -23,3 +23,6 @@
 
 (defn decode-uri [uri]
   (js/decodeURIComponent uri))
+
+(defn encode-uri [uri]
+  (js/encodeURIComponent uri))

@@ -9,7 +9,7 @@
   (:require-macros [kioo.om :refer [defsnippet deftemplate component]]))
 
 ;; The keys are all ints, so sort them such that :10 > :2
-(defn msg-comparator [key1 key2] (compare (read-string (name key1))
+(defn msg-comparator [key1 key2] (compare (read-string (name key1)) ;; XXX DANGER WILL ROBINSON
                                           (read-string (name key2))))
 
 (defn order-messages [msg-vector]
@@ -21,18 +21,21 @@
    [:span.author]  (content (:author message))
    [:span.message] (content (:message message))})
 
+(def my-data (atom nil))
+
 (defn room-view [data owner]
   (reify
     om/IWillMount
     (will-mount [_]
-      (ajax/GET (str "api/room/messages/" (:selected-room data))
+      (ajax/GET (str "/api/room/messages/" (uri/encode-uri (:selected-room data)))
                 {:format (ajax/json-format {:keywords? true})
                  :error-handler (fn [response]
                                   (println "get-message ERROR!" response))
                  :handler (fn [response]
                             (let [messages (order-messages (:msg-vect response))]
                               (println "MESSAGES!" messages)
-                              (om/update! data :messages messages)))}))
+                              (om/update! data :messages messages)
+                              (reset! my-data data)))}))
 
     om/IRenderState
     (render-state [_ state]
@@ -60,7 +63,9 @@
         (component
          "templates/room.html"
          {[:button.back-btn]
-          (listen :onClick #(om/update! data :selected-room nil))
+          (listen :onClick #(do
+                              (om/update! data :selected-room nil)
+                              (om/update! data :messages {})))
 
           [:span#room-name]
           (content (:selected-room data))

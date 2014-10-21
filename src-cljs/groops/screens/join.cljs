@@ -30,7 +30,6 @@
 
                 (om/update! data :selected-room room-name))))})
 
-
 (defprotocol IRefreshState
   (refresh-state [_]))
 
@@ -39,11 +38,11 @@
     IRefreshState
     (refresh-state [_]
       (ajax/GET "/api/rooms"
-                {:format (ajax/json-format {:keywords? true})
+                {:format (ajax/json-format {:keywords? false})
                  :error-handler (fn [response]
                                   (println "get-rooms ERROR!" response))
                  :handler (fn [response]
-                            (let [names (map uri/decode-uri (map name (keys response)))
+                            (let [names (keys response)
                                   counts (vals response)]
                               (om/update! data :room-list (reduce conj (sorted-map) 
                                                                   (zipmap names counts)))))}))

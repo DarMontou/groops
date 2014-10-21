@@ -3,7 +3,7 @@
             [compojure.core :refer :all]
             [groops.data :as data]
             [liberator.core :refer [resource defresource]]
-            [ring.util.codec :refer [url-encode]]))
+            [ring.util.codec :refer [url-encode url-decode]]))
 
 (def post-user
   (resource :allowed-methods [:post]
@@ -34,11 +34,13 @@
                                counts (map data/get-room-user-count room-names)]
                              (println "GET /api/rooms")
                              (reduce conj (sorted-map) 
-                                     (zipmap encoded-room-names counts))))))
+                                     (zipmap room-names counts))))))
 
 (defresource get-messages [room]
   :allowed-methods [:get]
   :available-media-types ["application/json"]
+  :handle-exception (fn [e] (println "get-messages EXCEPTION: " e " room: " room))
+  :handle-not-found (fn [_] (println "get-messages NOT-FOUND->room: " room))
   :handle-ok (fn [_]
                (println "get-messages response: " {:msg-vect (data/get-messages room)})
                {:msg-vect (data/get-messages room)}))
@@ -57,10 +59,11 @@
                                           :message message 
                                           :gravatar-uri gravatar-uri}}))))
 
+(def my-room (atom nil))
+
 (defroutes api-routes
-  (context "/api" []
-           (POST "/user" [] post-user)
-           (POST "/room" [] post-room)
-           (GET "/rooms" [] get-rooms)
-           (GET "/room/messages/:room" [room] (get-messages room))
-           (POST "/room/message" [] post-message)))
+  (POST "/api/user" [] post-user)
+  (POST "/api/room" [] post-room)
+  (GET "/api/rooms" [] get-rooms)
+  (GET "/api/room/messages/:room" [room] (get-messages room))
+  (POST "/api/room/message" [] post-message))
