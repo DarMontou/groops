@@ -64,6 +64,14 @@
          "templates/room.html"
          {[:button.back-btn]
           (listen :onClick #(do
+                              (let [room-name (name (first room-vect))
+                                    user (:user @data)]
+                                (println "LEAVEZ")
+                                (when-let [ch (om/get-shared owner :chan)]
+                                  (println "*** ch" ch)
+                                  (go (>! ch {:topic "leave"
+                                              :data {:user (:name user)
+                                                     :room room-name}}))))
                               (om/update! data :selected-room nil)
                               (om/update! data :messages {})))
 

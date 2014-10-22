@@ -25,6 +25,12 @@
   (swap! room-users (fn [clients]
                    (assoc-in clients [(:room data) (:user data)] channel))))
 
+(defmethod dispatch-message "leave" [channel topic data]
+  (swap! room-users (fn [clients]
+                      (let [room (:room data)
+                            user (:user data)]
+                        (println "LEAVE: room: " room " user: " user "\n\tdata: " data)
+                        (conj @room-users {room (dissoc (get @room-users room) user)})))))
 
 ;; ----------------------------------------
 

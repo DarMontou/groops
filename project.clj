@@ -11,6 +11,7 @@
                  [ring/ring-devel "1.1.8"]
                  [ring/ring-core "1.1.8"]
                  [ring/ring-json "0.3.1"]
+                 [ring/ring-codec "1.0.0"]
                  [liberator "0.12.1"]
                  [enlive "1.1.5"]
                  [org.clojure/core.async "0.1.346.0-17112a-alpha"]
@@ -25,7 +26,7 @@
 
                  ;; dev
                  [org.clojure/tools.nrepl "0.2.3"]
-                 [cider/cider-nrepl "0.8.0-snapshot"]
+                 [cider/cider-nrepl "0.7.0"]
                  [figwheel "0.1.4-SNAPSHOT"]]
 
   :plugins [[com.cemerick/austin "0.1.5"]
